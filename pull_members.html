@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Authorization</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .dark-mode {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .light-mode {
+            background-color: #f9f9f9;
+            color: #212121;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 600px;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        .dark-mode .card {
+            background-color: #1e1e1e;
+        }
+        .light-mode .card {
+            background-color: #ffffff;
+        }
+        .btn {
+            transition: transform 0.2s ease, background-color 0.3s ease;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .btn:focus {
+            outline: none;
+        }
+        #feedback {
+            margin-top: 20px;
+            font-size: 1.2em;
+            display: none;
+        }
+        .error-message {
+            color: #e53935;
+        }
+        .success-message {
+            color: #43a047;
+        }
+        .dark-mode .btn {
+            background-color: #1565c0;
+        }
+        .light-mode .btn {
+            background-color: #2196f3;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+<div class="container">
+    <div class="switch right-align">
+        <label>
+            Light
+            <input type="checkbox" id="darkModeToggle">
+            <span class="lever"></span>
+            Dark
+        </label>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <h4 class="card-title center-align">Admin Authorization</h4>
+            <form id="adminForm">
+                <div class="input-field">
+                    <input type="password" id="admin_code" class="validate" required>
+                    <label for="admin_code">Admin Code</label>
+                    <span class="helper-text" data-error="Admin code is required"></span>
+                </div>
+                <button type="submit" class="btn waves-effect waves-light">Pull Members</button>
+            </form>
+            <div id="feedback" class="center-align"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script>
+    // Dark Mode Toggle Logic
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    darkModeToggle.addEventListener('change', function () {
+        if (this.checked) {
+            body.classList.remove('light-mode');
+            body.classList.add('dark-mode');
+        } else {
+            body.classList.remove('dark-mode');
+            body.classList.add('light-mode');
+        }
+    });
+
+    // Form Submission Logic
+    const form = document.getElementById('adminForm');
+    const feedback = document.getElementById('feedback');
+
+    form.onsubmit = async function (e) {
+        e.preventDefault();
+
+        const adminCode = document.getElementById('admin_code').value;
+        feedback.style.display = 'block';
+        feedback.textContent = 'Processing...';
+        feedback.className = 'blue-text';
+
+        try {
+            const response = await fetch('/pull_members', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ admin_code: adminCode }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                feedback.textContent = data.message;
+                feedback.className = 'success-message';
+                if (data.results) {
+                    feedback.innerHTML += '<ul style="text-align:left; margin-top:15px;">';
+                    data.results.forEach(result => {
+                        feedback.innerHTML += `<li>${result}</li>`;
+                    });
+                    feedback.innerHTML += '</ul>';
+                }
+            } else {
+                feedback.textContent = data.message || 'An error occurred.';
+                feedback.className = 'error-message';
+            }
+        } catch (error) {
+            feedback.textContent = 'Failed to connect to the server.';
+            feedback.className = 'error-message';
+        }
+    };
+</script>
+
+</body>
+</html>

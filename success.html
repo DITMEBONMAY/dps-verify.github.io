@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <!-- Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            text-align: center;
+            padding-top: 50px;
+        }
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            margin: 20px auto;
+            display: block;
+            border-radius: 50%;
+            background-color: #4caf50;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        .checkmark:before {
+            content: "✔";
+            color: white;
+            font-size: 50px;
+            position: relative;
+            top: 25px;
+            left: 20px;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <h3>🎉 Members Added Successfully! 🎉</h3>
+    <div class="checkmark"></div>
+    <p>The following users have been added to the server:</p>
+    <ul class="collection">
+        {% for result in results %}
+            <li class="collection-item">{{ result }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/" class="btn blue lighten-1">Go Home</a>
+    <script>
+        confetti({
+            particleCount: 150,
+            spread: 60,
+            origin: { y: 0.6 }
+        });
+    </script>
+</body>
+</html>
